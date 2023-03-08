@@ -1,24 +1,21 @@
 /// <reference lib="webworker" />
 import { Service } from './service'
-await import('https://unpkg.com/@tensorflow/tfjs-core@2.4.0/dist/tf-core.js')
-await import(
-  'https://unpkg.com/@tensorflow/tfjs-converter@2.4.0/dist/tf-converter.js'
-)
-await import(
-  'https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.4.0/dist/tf-backend-webgl.js'
-)
-await import(
-  'https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js'
-)
+import * as tf from '@tensorflow/tfjs-core'
+import '@tensorflow/tfjs-converter'
+import '@tensorflow/tfjs-backend-webgl'
+import * as faceLandmarksPackage from '@tensorflow-models/face-landmarks-detection'
 
-const { faceLandmarksDetection, tf } = self
 tf.setBackend('webgl')
 
-const service = new Service({ faceLandmarksDetection })
+const service = new Service({ faceLandmarksDetection: faceLandmarksPackage })
 
-console.log('Loading model')
-await service.loadModel()
-console.log('TF Model loaded')
+console.log('Loading model...')
+service
+  .loadModel()
+  .then(() => {
+    console.log('TF Model loaded')
+  })
+  .catch((err) => console.log(err))
 
 export const getBlinked = async (video) => {
   const blinked = await service.handBlinked(video)

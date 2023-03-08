@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { worker, camera } from './video/src/factory'
-
 export default function Home() {
-  const [logs, setLogs] = useState<string>('Waiting for service...')
+  const [logs] = useState<string>('Waiting for service...')
   const buttonRef = useRef<HTMLButtonElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [blik, setBlik] = useState(0)
@@ -12,14 +11,12 @@ export default function Home() {
     willReadFrequently: true,
   })
 
-  function getStarted() {
+  async function getStarted() {
+    const workerSync = await worker
+    const cameraSync = await camera
     setInterval(async () => {
-      await loop(camera?.video, worker)
+      await loop(cameraSync?.video, workerSync)
     }, 300)
-  }
-
-  function log(text: string) {
-    setLogs(text)
   }
 
   function getVideoFrame(video) {
@@ -41,10 +38,10 @@ export default function Home() {
     videoRef?.current?.pause()
   }
 
-  async function loop(video, worker) {
+  async function loop(video, workerSync) {
     const img = getVideoFrame(video)
 
-    const blink = await worker.getBlinked(img)
+    const blink = await workerSync.getBlinked(img)
 
     if (blink) {
       tooglePlayVideo()

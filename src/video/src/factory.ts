@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+// @ts-nocheck
 import Controller from './controller'
 import { Camera } from '../../shared/camera'
 import { supportsWorkerType } from '../../shared/util'
@@ -15,21 +16,16 @@ export async function getWorker() {
     return worker
   } else {
     console.log('WebWorker not supported')
-    await import(
-      'https://unpkg.com/@tensorflow/tfjs-core@2.4.0/dist/tf-core.js'
-    )
-    await import(
-      'https://unpkg.com/@tensorflow/tfjs-converter@2.4.0/dist/tf-converter.js'
-    )
-    await import(
-      'https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.4.0/dist/tf-backend-webgl.js'
-    )
-    await import(
-      'https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js'
+
+    await import('@tensorflow/tfjs-core')
+    await import('@tensorflow/tfjs-converter')
+    await import('@tensorflow/tfjs-backend-webgl')
+    const faceLandmarksDetection = await import(
+      '@tensorflow-models/face-landmarks-detection'
     )
 
     const service = new Service({
-      faceLandmarksDetection: window.faceLandmarksDetection,
+      faceLandmarksDetection,
     })
 
     const workerMock = {
@@ -46,9 +42,13 @@ export async function getWorker() {
   }
 }
 
-export const worker = await getWorker()
+export const worker = getWorker()
+  .then((ready) => ready)
+  .catch((err) => console.log(err))
 
-export const camera = await Camera.init()
+export const camera = Camera.init()
+  .then((ready) => ready)
+  .catch((err) => console.log(err))
 
 export const factory = (worker, camera) => {
   return {
