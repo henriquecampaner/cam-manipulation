@@ -17,8 +17,26 @@ service
   })
   .catch((err) => console.log(err))
 
-export const getBlinked = async (video) => {
+export const getBothBlink = async (video) => {
   const blinked = await service.handBlinked(video)
+
+  if (!blinked) return
+  return blinked
+}
+
+export const getLeftBlink = async (video) => {
+  const blinked = await service.handLeftBlinked(video)
+
+  console.log('blinked', blinked)
+
+  if (!blinked) return
+  return blinked
+}
+
+export const getRightBlink = async (video) => {
+  const blinked = await service.handRightBlinked(video)
+
+  console.log('blinked', blinked)
 
   if (!blinked) return
   return blinked

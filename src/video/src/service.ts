@@ -50,6 +50,54 @@ export class Service {
     return false
   }
 
+  async handLeftBlinked(video) {
+    const predictions = await this.estimateFaces(video)
+    if (!predictions.length) return false
+
+    for (const prediction of predictions) {
+      // Right eye parameters
+      const lowerRight = prediction.annotations.rightEyeUpper0
+      const upperRight = prediction.annotations.rightEyeLower0
+      const rightEAR = this.getEAR(upperRight, lowerRight)
+      // Left eye parameters
+      const lowerLeft = prediction.annotations.leftEyeUpper0
+      const upperLeft = prediction.annotations.leftEyeLower0
+      const leftEAR = this.getEAR(upperLeft, lowerLeft)
+
+      // True if the eye is closed
+      const blinked = leftEAR <= EAR_THRESHOLD && rightEAR >= EAR_THRESHOLD
+      if (!blinked) continue
+      if (!shouldRun()) continue
+
+      return blinked
+    }
+    return false
+  }
+
+  async handRightBlinked(video) {
+    const predictions = await this.estimateFaces(video)
+    if (!predictions.length) return false
+
+    for (const prediction of predictions) {
+      // Right eye parameters
+      const lowerRight = prediction.annotations.rightEyeUpper0
+      const upperRight = prediction.annotations.rightEyeLower0
+      const rightEAR = this.getEAR(upperRight, lowerRight)
+      // Left eye parameters
+      const lowerLeft = prediction.annotations.leftEyeUpper0
+      const upperLeft = prediction.annotations.leftEyeLower0
+      const leftEAR = this.getEAR(upperLeft, lowerLeft)
+
+      // True if the eye is closed
+      const blinked = leftEAR >= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD
+      if (!blinked) continue
+      if (!shouldRun()) continue
+
+      return blinked
+    }
+    return false
+  }
+
   private getEAR(upper, lower) {
     function getEucledianDistance(x1, y1, x2, y2) {
       return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))

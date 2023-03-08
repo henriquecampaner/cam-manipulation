@@ -4,10 +4,13 @@ export default function Home() {
   const [logs, setLogs] = useState<string>('Waiting for service...')
   const buttonRef = useRef<HTMLButtonElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [blik, setBlik] = useState(0)
   const [buttonText, setButtonText] = useState<string>(
     'Initialize Blink Recognition',
   )
+
+  const [leftBlink, setLeftBlink] = useState(0)
+  const [rightBlink, setRightBlink] = useState(0)
+  const [bothBlink, setBothBlink] = useState(0)
 
   const videoFrameCanvas = document.createElement('canvas')
 
@@ -50,14 +53,21 @@ export default function Home() {
   async function loop(video, workerSync) {
     const img = getVideoFrame(video)
 
-    const blink = await workerSync.getBlinked(img)
+    const rightBlink = await workerSync.getRightBlink(img)
+    const leftBlink = await workerSync.getLeftBlink(img)
+    const bothBlink = await workerSync.getBothBlink(img)
 
-    if (blink) {
+    if (bothBlink) {
       tooglePlayVideo()
+      setBothBlink((state) => state + 1)
     }
 
-    if (blink) {
-      setBlik((state) => state + 1)
+    if (rightBlink) {
+      setRightBlink((state) => state + 1)
+    }
+
+    if (leftBlink) {
+      setLeftBlink((state) => state + 1)
     }
   }
 
@@ -102,7 +112,9 @@ export default function Home() {
             </output>
           </div>
 
-          <p>How many times I blink = {blik}</p>
+          <p>Left Blink = {leftBlink}</p>
+          <p>Right Blink = {rightBlink}</p>
+          <p>Both Blink = {bothBlink}</p>
         </div>
 
         <canvas />
