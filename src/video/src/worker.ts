@@ -23,11 +23,3 @@ export const getBlinked = async (video) => {
   if (!blinked) return
   return blinked
 }
-
-export const xd = {
-  postMessage(dd) {
-    console.log('Post message: ', dd)
-  },
-
-  onmessage() {},
-}

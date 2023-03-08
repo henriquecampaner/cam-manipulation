@@ -34,6 +34,8 @@ export class Camera {
 
       document.body.appendChild(camera.video)
 
+      document.getElementById('main-container')?.appendChild(camera.video)
+
       // wait for the video to be ready
       await new Promise((resolve) => {
         console.log('waiting for video to be ready')
